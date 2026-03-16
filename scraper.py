@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from timezonefinder import TimezoneFinder
+from cache import get_cached, set_cached
 
 WIKI_API = "https://en.wikipedia.org/w/api.php"
 WIKI_BASE = "https://en.wikipedia.org/wiki/"
@@ -137,6 +138,10 @@ def normalize_airport_name(name):
 def get_airport_info(airport_name):
     airport_name = normalize_airport_name(airport_name)
 
+    cached = get_cached(airport_name)
+    if cached:
+        return cached
+    
     # Always try Wikipedia opensearch first — it finds the correct page title
     # regardless of how the airport API names it
     search_query = airport_name
@@ -155,4 +160,7 @@ def get_airport_info(airport_name):
         soup = BeautifulSoup(res.text, "html.parser")
         info = get_airport_info_from_infobox(soup)
 
+    if info.get("country"):
+        set_cached(airport_name, info)
+        
     return info

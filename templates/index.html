@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Status Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        form { display: flex; gap: 10px; margin-bottom: 30px; }
+        input { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        button { padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0052a3; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; background: #e0f0e0; color: #2a7a2a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { padding: 8px 0; border-bottom: 1px solid #eee; }
+        td:first-child { color: #666; width: 120px; }
+        .error { color: red; background: #fff0f0; padding: 12px; border-radius: 4px; }
+        h2 { margin-top: 0; color: #0066cc; }
+    </style>
+</head>
+<body>
+    <h1>✈️ Flight Status Tracker</h1>
+
+    <form method="POST">
+        <input name="iata" placeholder="Enter flight IATA (e.g. AI101)" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error %}
+        <div class="error">❌ {{ error }}</div>
+    {% endif %}
+
+    {% if flight %}
+        <div class="card">
+            <h2>{{ flight.airline }} — {{ flight.iata }}</h2>
+            <span class="status">{{ flight.status }}</span>
+        </div>
+
+        {% for label, endpoint in [("Departure", flight.departure), ("Arrival", flight.arrival)] %}
+        <div class="card">
+            <h2>{{ label }}</h2>
+            <table>
+                <tr><td>Airport</td><td>{{ endpoint.airport }}</td></tr>
+                <tr><td>Country</td><td>{{ endpoint.country }}</td></tr>
+                <tr><td>Timezone</td><td>{{ endpoint.timezone }}</td></tr>
+                <tr><td>Terminal</td><td>{{ endpoint.terminal }}</td></tr>
+                <tr><td>Gate</td><td>{{ endpoint.gate }}</td></tr>
+                <tr><td>Scheduled</td><td>{{ endpoint.scheduled }}</td></tr>
+                <tr><td>Estimated</td><td>{{ endpoint.estimated }}</td></tr>
+                <tr><td>Actual</td><td>{{ endpoint.actual }}</td></tr>
+                <tr><td>Delay</td><td>{{ endpoint.delay }}</td></tr>
+            </table>
+        </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
+```
+
+**Run the web app:**
+```
+python web.py

@@ -1,0 +1,50 @@
+{
+  "Dallas/Fort Worth International": {
+    "data": {
+      "location": "Cities of Grapevine , Irving , Euless , and Coppell in Tarrant and Dallas counties, Texas , U.S.",
+      "country": "U.S.",
+      "elevation": "185 m / 607 ft",
+      "lat": 32.89694,
+      "lon": -97.03806,
+      "coordinates": "32\u00b053\u203249\u2033N 97\u00b002\u203217\u2033W  /  32.89694\u00b0N 97.03806\u00b0W  / 32.89694; -97.03806",
+      "timezone": "America/Chicago"
+    },
+    "cached_at": 1773682500.4475029
+  },
+  "Hartsfield-jackson Atlanta International": {
+    "data": {
+      "location": "Clayton and Fulton counties, Georgia , U.S.",
+      "country": "U.S.",
+      "elevation": "313 m / 1,026 ft",
+      "lat": 33.63667,
+      "lon": -84.42806,
+      "coordinates": "33\u00b038\u203212\u2033N 84\u00b025\u203241\u2033W  /  33.63667\u00b0N 84.42806\u00b0W  / 33.63667; -84.42806",
+      "timezone": "America/New_York"
+    },
+    "cached_at": 1773682501.45506
+  },
+  "Singapore Changi": {
+    "data": {
+      "location": "Changi , East Region , Singapore",
+      "country": "Singapore",
+      "elevation": "6.65 m / 22 ft",
+      "lat": 1.35917,
+      "lon": 103.98944,
+      "coordinates": "1\u00b021\u203233\u2033N 103\u00b059\u203222\u2033E  /  1.35917\u00b0N 103.98944\u00b0E  / 1.35917; 103.98944",
+      "timezone": "Asia/Singapore"
+    },
+    "cached_at": 1773683410.972581
+  },
+  "Heathrow": {
+    "data": {
+      "location": "Hillingdon , London, England",
+      "country": "England",
+      "elevation": "83 ft / 25 m",
+      "lat": 51.4775,
+      "lon": -0.46139,
+      "coordinates": "51\u00b028\u203239\u2033N 000\u00b027\u203241\u2033W  /  51.47750\u00b0N 0.46139\u00b0W  / 51.47750; -0.46139",
+      "timezone": "Europe/London"
+    },
+    "cached_at": 1773683412.7770982
+  }
+}
