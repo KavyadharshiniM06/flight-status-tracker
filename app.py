@@ -1,7 +1,10 @@
 from api import get_flight_data
 from scraper import get_airport_info
+import os
+from dotenv import load_dotenv
 
-API_KEY="5015bcc6c186da460fd4153a55cae153"
+load_dotenv()
+API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
 
 
 def main():
