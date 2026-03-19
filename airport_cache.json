@@ -46,5 +46,125 @@
       "timezone": "Europe/London"
     },
     "cached_at": 1773683412.7770982
+  },
+  "John F Kennedy International": {
+    "data": {
+      "location": "Jamaica , Queens , New York City , U.S.",
+      "country": "U.S.",
+      "elevation": "4 m / 13 ft",
+      "lat": 40.63972,
+      "lon": -73.77889,
+      "coordinates": "40\u00b038\u203223\u2033N 73\u00b046\u203244\u2033W  /  40.63972\u00b0N 73.77889\u00b0W  / 40.63972; -73.77889",
+      "timezone": "America/New_York"
+    },
+    "cached_at": 1773686037.0218496
+  },
+  "Indira Gandhi International": {
+    "data": {
+      "location": "Palam , Delhi , India",
+      "country": "India",
+      "elevation": "237 m / 777 ft",
+      "lat": 28.56861,
+      "lon": 77.11222,
+      "coordinates": "28\u00b034\u203207\u2033N 077\u00b006\u203244\u2033E  /  28.56861\u00b0N 77.11222\u00b0E  / 28.56861; 77.11222",
+      "timezone": "Asia/Kolkata"
+    },
+    "cached_at": 1773686039.1216822
+  },
+  "Leonardo Da Vinci Fiumicino": {
+    "data": {
+      "location": "Fiumicino , Metropolitan City of Rome Capital , Lazio , Italy",
+      "country": "Italy",
+      "elevation": "15 ft / 5 m",
+      "lat": 41.80028,
+      "lon": 12.23889,
+      "coordinates": "41\u00b048\u203201\u2033N 012\u00b014\u203220\u2033E  /  41.80028\u00b0N 12.23889\u00b0E  / 41.80028; 12.23889",
+      "timezone": "Europe/Rome"
+    },
+    "cached_at": 1773686186.6193376
+  },
+  "Newark Liberty International": {
+    "data": {
+      "location": "Newark and Elizabeth , New Jersey , United States [ 1 ] [ 2 ]",
+      "country": "United States [ 1 ] [ 2 ]",
+      "elevation": "5 m / 18 ft",
+      "lat": 40.6925,
+      "lon": -74.16861,
+      "coordinates": "40\u00b041\u203233\u2033N 074\u00b010\u203207\u2033W  /  40.69250\u00b0N 74.16861\u00b0W  / 40.69250; -74.16861",
+      "timezone": "America/New_York"
+    },
+    "cached_at": 1773686187.9359114
+  },
+  "Dubai": {
+    "data": {
+      "location": "Al Garhoud , Dubai, UAE",
+      "country": "UAE",
+      "elevation": "62 ft / 19 m",
+      "lat": 25.25278,
+      "lon": 55.36444,
+      "coordinates": "25\u00b015\u203210\u2033N 055\u00b021\u203252\u2033E  /  25.25278\u00b0N 55.36444\u00b0E  / 25.25278; 55.36444",
+      "timezone": "Asia/Dubai"
+    },
+    "cached_at": 1773686230.3084447
+  },
+  "Doha International": {
+    "data": {
+      "location": "Doha , Qatar",
+      "country": "Qatar",
+      "elevation": "35 ft / 11 m",
+      "lat": 25.26111,
+      "lon": 51.565,
+      "coordinates": "DIA /OTBD Location of airport in Doha , Qatar Show map of Doha DIA /OTBD DIA /OTBD (Qatar) Show map of Qatar DIA /OTBD DIA /OTBD (Middle East) Show map of Middle East DIA /OTBD DIA /OTBD (West and Central Asia) Show map of West and Central Asia DIA /OTBD DIA /OTBD (Asia) Show map of Asia",
+      "timezone": "Asia/Qatar"
+    },
+    "cached_at": 1773686246.539219
+  },
+  "Bangalore International Airport": {
+    "data": {
+      "location": "Devanahalli , Bengaluru Rural district , Karnataka , India",
+      "country": "India",
+      "elevation": "915 m / 3,002 ft",
+      "lat": 13.19889,
+      "lon": 77.70556,
+      "coordinates": "13\u00b011\u203256\u2033N 077\u00b042\u203220\u2033E  /  13.19889\u00b0N 77.70556\u00b0E  / 13.19889; 77.70556",
+      "timezone": "Asia/Kolkata"
+    },
+    "cached_at": 1773686249.7025802
+  },
+  "San Francisco International": {
+    "data": {
+      "location": "San Mateo County , California , U.S.",
+      "country": "U.S.",
+      "elevation": "4 m / 13 ft",
+      "lat": 37.61889,
+      "lon": -122.375,
+      "coordinates": "37\u00b037\u203208\u2033N 122\u00b022\u203230\u2033W  /  37.61889\u00b0N 122.37500\u00b0W  / 37.61889; -122.37500",
+      "timezone": "America/Los_Angeles"
+    },
+    "cached_at": 1773686690.466307
+  },
+  "Greenville Spartanburg International Airport": {
+    "data": {
+      "location": "near Greer, South Carolina",
+      "country": "South Carolina",
+      "elevation": "964 ft / 294 m",
+      "lat": 34.89556,
+      "lon": -82.21889,
+      "coordinates": "34\u00b053\u203244\u2033N 082\u00b013\u203208\u2033W  /  34.89556\u00b0N 82.21889\u00b0W  / 34.89556; -82.21889",
+      "timezone": "America/New_York"
+    },
+    "cached_at": 1773686927.856188
+  },
+  "Detroit Metropolitan Wayne County": {
+    "data": {
+      "location": "Romulus , Michigan , U.S.",
+      "country": "U.S.",
+      "elevation": "197 m / 645 ft",
+      "lat": 42.2125,
+      "lon": -83.35333,
+      "coordinates": "42\u00b012\u203245\u2033N 083\u00b021\u203212\u2033W  /  42.21250\u00b0N 83.35333\u00b0W  / 42.21250; -83.35333",
+      "timezone": "America/Detroit"
+    },
+    "cached_at": 1773686930.212378
   }
 }
