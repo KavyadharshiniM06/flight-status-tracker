@@ -17,6 +17,8 @@ API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
 app.config["SECRET_KEY"]                     = os.getenv("SECRET_KEY", "dev-secret-key")
 app.config["SQLALCHEMY_DATABASE_URI"]        = os.getenv("DATABASE_URL", "sqlite:///flights.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "jwt-secret-key")
+jwt = JWTManager(app)
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -238,6 +240,160 @@ def delete_account():
     db.session.commit()
 
     return redirect(url_for("auth.login"))
+
+# Mobile login — returns JWT token
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    data     = request.get_json()
+    email    = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    user     = User.query.filter_by(email=email).first()
+
+    if not user or not bcrypt.check_password_hash(user.password, password):
+        return jsonify({"error": "Invalid email or password"}), 401
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "token": token,
+        "user": {
+            "id":    user.id,
+            "name":  user.name,
+            "email": user.email,
+            "phone": user.phone
+        }
+    })
+
+
+# Mobile register
+@app.route("/api/register", methods=["POST"])
+def api_register():
+    data  = request.get_json()
+    name  = data.get("name", "").strip()
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    phone = data.get("phone", "").strip()
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "Email already registered"}), 400
+
+    hashed = bcrypt.generate_password_hash(password).decode("utf-8")
+    user   = User(name=name, email=email, phone=phone, password=hashed)
+    db.session.add(user)
+    db.session.commit()
+
+    token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "token": token,
+        "user": {
+            "id":    user.id,
+            "name":  user.name,
+            "email": user.email,
+            "phone": user.phone
+        }
+    })
+
+
+# Mobile flight search — JWT protected
+@app.route("/api/mobile/flight/<iata>")
+@jwt_required()
+def api_mobile_flight(iata):
+    try:
+        user_id  = int(get_jwt_identity())
+        flight   = get_flight_data(API_KEY, iata)
+        dep      = flight["departure"]
+        arr      = flight["arrival"]
+        dep_info = get_airport_info(dep["airport"])
+        arr_info = get_airport_info(arr["airport"])
+
+        from models import SearchHistory
+        db.session.add(SearchHistory(
+            user_id     = user_id,
+            iata        = iata,
+            airline     = flight["airline"]["name"],
+            status      = flight["flight_status"],
+            dep_airport = dep.get("airport"),
+            arr_airport = arr.get("airport")
+        ))
+        db.session.commit()
+
+        return jsonify({
+            "airline": flight["airline"]["name"],
+            "iata":    flight["flight"]["iata"],
+            "status":  flight["flight_status"],
+            "departure": {
+                "airport":   dep.get("airport"),
+                "country":   dep_info.get("country", "N/A"),
+                "timezone":  dep_info.get("timezone", "N/A"),
+                "terminal":  dep.get("terminal") or "N/A",
+                "gate":      dep.get("gate") or "N/A",
+                "scheduled": dep.get("scheduled"),
+                "estimated": dep.get("estimated"),
+                "actual":    dep.get("actual"),
+            },
+            "arrival": {
+                "airport":   arr.get("airport"),
+                "country":   arr_info.get("country", "N/A"),
+                "timezone":  arr_info.get("timezone", "N/A"),
+                "terminal":  arr.get("terminal") or "N/A",
+                "gate":      arr.get("gate") or "N/A",
+                "scheduled": arr.get("scheduled"),
+                "estimated": arr.get("estimated"),
+                "actual":    arr.get("actual"),
+            }
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+# Mobile saved flights
+@app.route("/api/saved", methods=["GET"])
+@jwt_required()
+def api_saved():
+    from models import SavedFlight
+    user_id = int(get_jwt_identity())
+    saved   = SavedFlight.query.filter_by(user_id=user_id).all()
+    return jsonify([{"iata": s.iata, "id": s.id} for s in saved])
+
+
+@app.route("/api/save/<iata>", methods=["POST"])
+@jwt_required()
+def api_save_flight(iata):
+    from models import SavedFlight
+    user_id  = int(get_jwt_identity())
+    existing = SavedFlight.query.filter_by(user_id=user_id, iata=iata).first()
+    if not existing:
+        db.session.add(SavedFlight(user_id=user_id, iata=iata))
+        db.session.commit()
+    return jsonify({"saved": True})
+
+
+@app.route("/api/unsave/<iata>", methods=["POST"])
+@jwt_required()
+def api_unsave_flight(iata):
+    from models import SavedFlight
+    user_id = int(get_jwt_identity())
+    SavedFlight.query.filter_by(user_id=user_id, iata=iata).delete()
+    db.session.commit()
+    return jsonify({"saved": False})
+
+
+# Mobile history
+@app.route("/api/history")
+@jwt_required()
+def api_history():
+    from models import SearchHistory
+    user_id = int(get_jwt_identity())
+    history = SearchHistory.query.filter_by(user_id=user_id)\
+                .order_by(SearchHistory.searched_at.desc()).limit(10).all()
+    return jsonify([{
+        "iata":        h.iata,
+        "airline":     h.airline,
+        "status":      h.status,
+        "dep_airport": h.dep_airport,
+        "arr_airport": h.arr_airport,
+        "searched_at": h.searched_at.isoformat()
+    } for h in history])
+
 
 with app.app_context():
     db.create_all()
