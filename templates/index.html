@@ -3,217 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Status Tracker</title>
+    <title>Flight Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            900: '#0a0f1e',
-                            800: '#0f1729',
-                            700: '#131929',
-                            600: '#1e2a3a',
-                            500: '#2a3a52',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-navy-900 min-h-screen text-slate-200 py-10 px-4">
+<body class="bg-slate-950 min-h-screen text-slate-200">
 
-    <!-- Header -->
-    <div class="text-center mb-10">
-        <h1 class="text-4xl font-bold text-white mb-2">✈️ Flight Tracker</h1>
-        <p class="text-slate-400 text-sm">Enter one or more flight codes separated by commas</p>
-    </div>
-
-    <!-- Search Box -->
-    <div class="max-w-xl mx-auto bg-navy-700 rounded-2xl p-6 shadow-xl mb-6">
-        <form method="POST" onsubmit="showSpinner()">
-
-            <label class="block text-xs uppercase tracking-widest text-slate-400 mb-1">
-                Flight IATA Code(s)
-            </label>
-            <input
-                name="iata"
-                placeholder="e.g. AI101, BA117, EK202"
-                required
-                value="{{ request.form.get('iata', '') }}"
-                class="w-full bg-navy-600 border border-navy-500 text-slate-200
-                       placeholder-slate-600 rounded-lg px-4 py-3 mb-4 text-sm
-                       focus:outline-none focus:border-blue-500 transition"
-            >
-
-            <label class="block text-xs uppercase tracking-widest text-slate-400 mb-1">
-                Alert Email (optional)
-            </label>
-            <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value="{{ request.form.get('email', '') }}"
-                class="w-full bg-navy-600 border border-navy-500 text-slate-200
-                       placeholder-slate-600 rounded-lg px-4 py-3 mb-4 text-sm
-                       focus:outline-none focus:border-blue-500 transition"
-            >
-
-            <label class="block text-xs uppercase tracking-widest text-slate-400 mb-1">
-                Alert Phone / SMS (optional)
-            </label>
-            <input
-                name="phone"
-                type="tel"
-                placeholder="+91XXXXXXXXXX"
-                value="{{ request.form.get('phone', '') }}"
-                class="w-full bg-navy-600 border border-navy-500 text-slate-200
-                       placeholder-slate-600 rounded-lg px-4 py-3 mb-4 text-sm
-                       focus:outline-none focus:border-blue-500 transition"
-            >
-
-            <button
-                type="submit"
-                id="search-btn"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold
-                       py-3 rounded-lg text-sm tracking-wide transition"
-            >
-                🔍 Track Flights
-            </button>
-        </form>
-
-        <!-- Spinner -->
-        <div id="spinner" class="hidden text-center text-blue-400 text-sm mt-4">
-            ⏳ Fetching flight data, please wait...
+    <!-- Navbar -->
+    <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4
+                flex justify-between items-center">
+        <span class="text-white font-bold text-lg">✈️ Flight Tracker</span>
+        <div class="flex items-center gap-4">
+            <span class="text-slate-400 text-sm">Hi, {{ current_user.name }}</span>
+            <a href="{{ url_for('profile') }}"
+            class="text-sm text-slate-400 hover:text-slate-200 transition">
+                Profile
+            </a>
+            <a href="{{ url_for('auth.logout') }}"
+            class="text-sm text-blue-400 hover:text-blue-300 transition">
+                Logout
+            </a>
         </div>
-    </div>
+    </nav>
 
-    <!-- Alert Status Banner -->
-    {% if alert_status %}
-        <div class="max-w-xl mx-auto mb-6 px-4 py-3 rounded-xl text-center text-sm font-medium
-            {{ 'bg-green-950 text-green-400 border border-green-800' if '✅' in alert_status
-               else 'bg-orange-950 text-orange-400 border border-orange-800' }}">
-            {{ alert_status }}
-        </div>
-    {% endif %}
+    <div class="flex max-w-7xl mx-auto px-4 py-8 gap-6">
 
-    <!-- Flight Cards -->
-    {% for flight in flights %}
+        <!-- Sidebar -->
+        <aside class="w-64 shrink-0 hidden lg:block space-y-6">
 
-        {% if flight.error is defined %}
-            <div class="max-w-3xl mx-auto mb-5 bg-red-950 border border-red-800
-                        text-red-400 rounded-xl px-5 py-4 text-sm">
-                ❌ <strong>{{ flight.iata }}</strong>: {{ flight.error }}
+            <!-- Saved Flights -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+                <h3 class="text-xs font-semibold uppercase tracking-widest
+                           text-slate-400 mb-4">
+                    Saved Flights
+                </h3>
+                {% if saved %}
+                    <ul class="space-y-2">
+                        {% for s in saved %}
+                            <li class="flex justify-between items-center">
+                                <button
+                                    onclick="searchFlight('{{ s.iata }}')"
+                                    class="text-blue-400 hover:text-blue-300
+                                           text-sm font-medium transition">
+                                    {{ s.iata }}
+                                </button>
+                                <form method="POST"
+                                      action="{{ url_for('unsave_flight', iata=s.iata) }}">
+                                    <button class="text-slate-600 hover:text-red-400
+                                                   text-xs transition">
+                                        ✕
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-slate-600 text-xs">No saved flights yet.</p>
+                {% endif %}
             </div>
 
-        {% else %}
-            <div class="max-w-3xl mx-auto mb-8 bg-navy-700 rounded-2xl overflow-hidden shadow-xl">
-
-                <!-- Flight Header -->
-                <div class="bg-gradient-to-r from-blue-950 to-navy-800 px-6 py-5
-                            flex flex-wrap justify-between items-center gap-4">
-                    <div>
-                        <h2 class="text-white font-bold text-lg">
-                            {{ flight.airline }} &mdash; {{ flight.iata }}
-                        </h2>
-                        <p class="text-slate-400 text-sm mt-1">
-                            {{ flight.departure.airport }}
-                            <span class="text-blue-400 mx-2">→</span>
-                            {{ flight.arrival.airport }}
-                        </p>
-                    </div>
-
-                    <!-- Status Badge -->
-                    {% if flight.status == 'active' %}
-                        <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest
-                                     bg-green-950 text-green-400 border border-green-800">
-                            {{ flight.status }}
-                        </span>
-                    {% elif flight.status == 'scheduled' %}
-                        <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest
-                                     bg-blue-950 text-blue-400 border border-blue-800">
-                            {{ flight.status }}
-                        </span>
-                    {% elif flight.status == 'landed' %}
-                        <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest
-                                     bg-slate-800 text-slate-400 border border-slate-600">
-                            {{ flight.status }}
-                        </span>
-                    {% elif flight.status == 'cancelled' %}
-                        <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest
-                                     bg-red-950 text-red-400 border border-red-800">
-                            {{ flight.status }}
-                        </span>
-                    {% else %}
-                        <span class="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest
-                                     bg-navy-600 text-slate-400 border border-navy-500">
-                            {{ flight.status }}
-                        </span>
+            <!-- Search History -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-semibold uppercase tracking-widest
+                            text-slate-400 mb-4">
+                        Recent Searches
+                    </h3>
+                    {% if history %}
+                        <form method="POST" action="{{ url_for('clear_history') }}">
+                            <button class="text-xs text-red-500 hover:text-red-400 transition">
+                                Clear
+                            </button>
+                        </form>
                     {% endif %}
                 </div>
+                {% if history %}
+                    <ul class="space-y-3">
+                        {% for h in history %}
+                            <li class="cursor-pointer"
+                                onclick="searchFlight('{{ h.iata }}')">
+                                <div class="text-sm text-blue-400
+                                            hover:text-blue-300 transition font-medium">
+                                    {{ h.iata }}
+                                </div>
+                                <div class="text-xs text-slate-600 mt-0.5">
+                                    {{ h.dep_airport }} → {{ h.arr_airport }}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-slate-600 text-xs">No searches yet.</p>
+                {% endif %}
+            </div>
 
-                <!-- Departure / Arrival Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0
-                            sm:divide-x divide-navy-600">
+        </aside>
 
-                    {% for label, ep in [("Departure", flight.departure), ("Arrival", flight.arrival)] %}
-                    <div class="p-6">
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0">
 
-                        <div class="text-xs font-semibold uppercase tracking-widest
-                                    text-blue-500 mb-1">
-                            {{ label }}
-                        </div>
+            <!-- Search Box -->
+            <div class="bg-slate-900 rounded-2xl p-6 shadow-xl
+                        border border-slate-800 mb-6">
+                <form method="POST" onsubmit="showSpinner()" id="search-form">
 
-                        <div class="text-white font-bold text-base mb-5 leading-snug">
-                            {{ ep.airport }}
-                        </div>
+                    <label class="block text-xs uppercase tracking-widest
+                                  text-slate-400 mb-1">
+                        Flight IATA Code(s)
+                    </label>
+                    <input
+                        name="iata"
+                        id="iata-input"
+                        placeholder="e.g. AI101, BA117, EK202"
+                        required
+                        value="{{ last_iata }}"
+                        class="w-full bg-slate-800 border border-slate-700 text-slate-200
+                               placeholder-slate-600 rounded-lg px-4 py-3 mb-4 text-sm
+                               focus:outline-none focus:border-blue-500 transition"
+                    >
 
-                        <div class="space-y-3 text-sm">
+                    {% if current_user.phone %}
+                        <p class="text-xs text-slate-500 mt-2 mb-5">
+                            📱 SMS alerts will be sent to
+                            <span class="text-slate-400">{{ current_user.phone }}</span>
+                        </p>
+                    {% else %}
+                        <p class="text-xs text-orange-500 mt-2">
+                            ⚠️ No phone number on file — 
+                            <a href="{{ url_for('auth.profile') }}" 
+                            class="underline hover:text-orange-400">
+                                add one in your profile
+                            </a>
+                            to receive SMS alerts.
+                        </p>
+                    {% endif %}
 
-                            {% for field, value in [
-                                ("Country",   ep.country),
-                                ("Timezone",  ep.timezone),
-                                ("Terminal",  ep.terminal),
-                                ("Gate",      ep.gate),
-                                ("Scheduled", ep.scheduled),
-                                ("Estimated", ep.estimated),
-                                ("Actual",    ep.actual)
-                            ] %}
-                            <div class="flex justify-between gap-4">
-                                <span class="text-slate-500 shrink-0">{{ field }}</span>
-                                <span class="text-slate-300 text-right">{{ value }}</span>
-                            </div>
-                            {% endfor %}
+                    <button
+                        type="submit"
+                        id="search-btn"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white
+                               font-semibold py-3 rounded-lg text-sm
+                               tracking-wide transition"
+                    >
+                        🔍 Track Flights
+                    </button>
+                </form>
 
-                            <!-- Delay row with colour -->
-                            <div class="flex justify-between gap-4 pt-2
-                                        border-t border-navy-600">
-                                <span class="text-slate-500 shrink-0">Delay</span>
-                                <span class="text-right font-semibold
-                                    {%- if '✅' in ep.delay %} text-green-400
-                                    {%- elif '⚠️' in ep.delay %} text-orange-400
-                                    {%- else %} text-blue-400{%- endif %}">
-                                    {{ ep.delay }}
-                                </span>
-                            </div>
-
-                        </div>
-                    </div>
-                    {% endfor %}
-
+                <div id="spinner"
+                     class="hidden text-center text-blue-400 text-sm mt-4">
+                    ⏳ Fetching flight data, please wait...
                 </div>
             </div>
-        {% endif %}
 
-    {% endfor %}
+            <!-- Alert Status -->
+            {% if alert_status %}
+                <div class="mb-6 px-4 py-3 rounded-xl text-center text-sm font-medium
+                    {{ 'bg-green-950 text-green-400 border border-green-800'
+                       if '✅' in alert_status
+                       else 'bg-orange-950 text-orange-400 border border-orange-800' }}">
+                    {{ alert_status }}
+                </div>
+            {% endif %}
+
+            <!-- Flight Cards -->
+            {% for flight in flights %}
+                {% if flight.error is defined %}
+                    <div class="mb-5 bg-red-950 border border-red-800
+                                text-red-400 rounded-xl px-5 py-4 text-sm">
+                        ❌ <strong>{{ flight.iata }}</strong>: {{ flight.error }}
+                    </div>
+                {% else %}
+                    <div class="mb-8 bg-slate-900 rounded-2xl overflow-hidden
+                                shadow-xl border border-slate-800">
+
+                        <!-- Flight Header -->
+                        <div class="bg-gradient-to-r from-blue-950 to-slate-900
+                                    px-6 py-5 flex flex-wrap justify-between
+                                    items-center gap-4">
+                            <div>
+                                <h2 class="text-white font-bold text-lg">
+                                    {{ flight.airline }} &mdash; {{ flight.iata }}
+                                </h2>
+                                <p class="text-slate-400 text-sm mt-1">
+                                    {{ flight.departure.airport }}
+                                    <span class="text-blue-400 mx-2">→</span>
+                                    {{ flight.arrival.airport }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <!-- Save button -->
+                                <form method="POST"
+                                      action="{{ url_for('save_flight', iata=flight.iata) }}">
+                                    <button class="text-slate-500 hover:text-yellow-400
+                                                   text-lg transition"
+                                            title="Save flight">
+                                        ☆
+                                    </button>
+                                </form>
+
+                                <!-- Status badge -->
+                                {% if flight.status == 'active' %}
+                                    <span class="px-4 py-1 rounded-full text-xs font-bold
+                                                 uppercase tracking-widest bg-green-950
+                                                 text-green-400 border border-green-800">
+                                        {{ flight.status }}
+                                    </span>
+                                {% elif flight.status == 'scheduled' %}
+                                    <span class="px-4 py-1 rounded-full text-xs font-bold
+                                                 uppercase tracking-widest bg-blue-950
+                                                 text-blue-400 border border-blue-800">
+                                        {{ flight.status }}
+                                    </span>
+                                {% elif flight.status == 'landed' %}
+                                    <span class="px-4 py-1 rounded-full text-xs font-bold
+                                                 uppercase tracking-widest bg-slate-800
+                                                 text-slate-400 border border-slate-600">
+                                        {{ flight.status }}
+                                    </span>
+                                {% elif flight.status == 'cancelled' %}
+                                    <span class="px-4 py-1 rounded-full text-xs font-bold
+                                                 uppercase tracking-widest bg-red-950
+                                                 text-red-400 border border-red-800">
+                                        {{ flight.status }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Departure / Arrival -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 divide-y
+                                    sm:divide-y-0 sm:divide-x divide-slate-800">
+                            {% for label, ep in [("Departure", flight.departure),
+                                                  ("Arrival",   flight.arrival)] %}
+                            <div class="p-6">
+                                <div class="text-xs font-semibold uppercase
+                                            tracking-widest text-blue-500 mb-1">
+                                    {{ label }}
+                                </div>
+                                <div class="text-white font-bold text-base
+                                            mb-5 leading-snug">
+                                    {{ ep.airport }}
+                                </div>
+                                <div class="space-y-3 text-sm">
+                                    {% for field, value in [
+                                        ("Country",   ep.country),
+                                        ("Timezone",  ep.timezone),
+                                        ("Terminal",  ep.terminal),
+                                        ("Gate",      ep.gate),
+                                        ("Scheduled", ep.scheduled),
+                                        ("Estimated", ep.estimated),
+                                        ("Actual",    ep.actual)
+                                    ] %}
+                                    <div class="flex justify-between gap-4">
+                                        <span class="text-slate-500 shrink-0">
+                                            {{ field }}
+                                        </span>
+                                        <span class="text-slate-300 text-right">
+                                            {{ value }}
+                                        </span>
+                                    </div>
+                                    {% endfor %}
+
+                                    <!-- Delay -->
+                                    <div class="flex justify-between gap-4
+                                                pt-2 border-t border-slate-800">
+                                        <span class="text-slate-500 shrink-0">
+                                            Delay
+                                        </span>
+                                        <span class="text-right font-semibold
+                                            {%- if '✅' in ep.delay %} text-green-400
+                                            {%- elif '⚠️' in ep.delay %} text-orange-400
+                                            {%- else %} text-blue-400{%- endif %}">
+                                            {{ ep.delay }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        </main>
+    </div>
 
     <script>
         function showSpinner() {
             document.getElementById("search-btn").disabled = true;
             document.getElementById("search-btn").textContent = "Searching...";
             document.getElementById("spinner").classList.remove("hidden");
+        }
+
+        function searchFlight(iata) {
+            document.getElementById("iata-input").value = iata;
+            document.getElementById("search-form").submit();
         }
     </script>
 

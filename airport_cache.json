@@ -166,5 +166,29 @@
       "timezone": "America/Detroit"
     },
     "cached_at": 1773686930.212378
+  },
+  "Suvarnabhumi International": {
+    "data": {
+      "location": "Racha Thewa , Bang Phli , Samut Prakan , Thailand",
+      "country": "Thailand",
+      "elevation": "2 m / 5 ft",
+      "lat": 13.6925,
+      "lon": 100.75,
+      "coordinates": "13\u00b041\u203233\u2033N 100\u00b045\u203200\u2033E  /  13.69250\u00b0N 100.75000\u00b0E  / 13.69250; 100.75000",
+      "timezone": "Asia/Bangkok"
+    },
+    "cached_at": 1773921370.5882123
+  },
+  "Los Angeles International": {
+    "data": {
+      "location": "Westchester , Los Angeles , California , U.S.",
+      "country": "U.S.",
+      "elevation": "39 m / 128 ft",
+      "lat": 33.9425,
+      "lon": -118.40806,
+      "coordinates": "33\u00b056\u203233\u2033N 118\u00b024\u203229\u2033W  /  33.94250\u00b0N 118.40806\u00b0W  / 33.94250; -118.40806",
+      "timezone": "America/Los_Angeles"
+    },
+    "cached_at": 1773921413.6056669
   }
 }
